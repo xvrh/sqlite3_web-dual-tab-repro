@@ -1,0 +1,11 @@
+name: sqlite3_web_dual_tab_repro
+description: Minimal reproduction of NoModificationAllowedError in sqlite3_web (via sqlite_async) when two tabs initialize concurrently.
+publish_to: none
+environment:
+  sdk: ^3.9.0
+dependencies:
+  sqlite_async: ^0.14.0
+  web: ^1.0.0
+dev_dependencies:
+  shelf: ^1.4.0
+  shelf_static: ^1.1.0
