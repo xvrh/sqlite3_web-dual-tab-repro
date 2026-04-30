@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_static/shelf_static.dart';
@@ -7,14 +9,16 @@ import 'package:shelf_static/shelf_static.dart';
 /// `crossOriginIsolated`. Without this, sqlite3_web takes the IndexedDB
 /// fallback path and the bug doesn't trigger.
 void main() async {
+  // Resolve `build/` relative to this script's location so the server
+  // works regardless of cwd.
+  final repoRoot = Directory(p.dirname(Platform.script.toFilePath())).parent;
+  final buildDir = p.join(repoRoot.path, 'build');
+
   final handler = const Pipeline()
       .addMiddleware(_addCoepCoop)
-      .addHandler(createStaticHandler(
-        '/tmp/sqlite3_web_repro/build',
-        defaultDocument: 'index.html',
-      ));
+      .addHandler(createStaticHandler(buildDir, defaultDocument: 'index.html'));
   final server = await shelf_io.serve(handler, 'localhost', 8765);
-  print('Serving http://${server.address.host}:${server.port}');
+  print('Serving $buildDir on http://${server.address.host}:${server.port}');
 }
 
 Handler _addCoepCoop(Handler inner) {

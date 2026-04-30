@@ -15,6 +15,7 @@ WASM_URL="https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-${S
 
 mkdir -p build
 cp web/index.html build/
+cp web/launcher.html build/
 
 if [ ! -f build/db_worker.js ]; then
   echo "Downloading db_worker.js v${SQLITE_ASYNC_VERSION}…"
@@ -32,4 +33,5 @@ DART="${DART:-dart}"
 echo "Compiling main.dart…"
 "$DART" compile js -O0 web/main.dart -o build/main.dart.js
 
-echo "Done. Run \`$DART run bin/serve.dart\` then open http://localhost:8765/."
+echo "Done. Run \`$DART run bin/serve.dart\` then open:"
+echo "  http://localhost:8765/launcher.html"

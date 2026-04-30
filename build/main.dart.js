@@ -14337,7 +14337,7 @@
     main() {
       var $async$goto = 0,
         $async$completer = A._makeAsyncAwaitCompleter(type$.void),
-        $async$handler = 1, $async$errorStack = [], db, e, exception, $status, log, $async$exception;
+        $async$handler = 1, $async$errorStack = [], db, e, st, exception, $status, log, $async$exception;
       var $async$main = A._wrapJsFunctionForAsync(function($async$errorCode, $async$result) {
         if ($async$errorCode === 1) {
           $async$errorStack.push($async$result);
@@ -14352,7 +14352,6 @@
               log.call$1("crossOriginIsolated: " + A.S(A.JSObjectUnsafeUtilExtension_getProperty(A.globalContext(), A.StringToJSString_get_toJS("crossOriginIsolated"), type$.nullable_Object)));
               $async$handler = 3;
               db = A.SqliteDatabase_SqliteDatabase(B.C_SqliteOptions, "repro_db");
-              log.call$1("SqliteDatabase created, awaiting first query\u2026");
               $async$goto = 6;
               return A._asyncAwait(db.execute$1("CREATE TABLE IF NOT EXISTS t (id INTEGER PRIMARY KEY)"), $async$main);
             case 6:
@@ -14367,7 +14366,9 @@
               $async$handler = 2;
               $async$exception = $async$errorStack.pop();
               e = A.unwrapException($async$exception);
+              st = A.getTraceFromException($async$exception);
               log.call$1("FAILED: " + A.S(e));
+              log.call$1(J.toString$0$(st));
               // goto after finally
               $async$goto = 5;
               break;

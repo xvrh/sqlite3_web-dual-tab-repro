@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>sqlite3_web NoModificationAllowedError manual repro</title>
+</head>
+<body>
+  <h1>sqlite3_web NoModificationAllowedError — manual repro</h1>
+  <p>
+    Click the button. It opens N sibling tabs of <code>/index.html</code>
+    in one user gesture, all running their <code>SqliteDatabase</code>
+    open concurrently. Their OPFS feature-detection probes race on
+    <code>_drift_feature_detection</code> in OPFS root, surfacing as:
+  </p>
+  <pre>NoModificationAllowedError: Failed to execute 'removeEntry' on 'FileSystemDirectoryHandle'</pre>
+  <p>
+    Open DevTools <strong>before clicking</strong> on each spawned
+    tab — Chrome won't show the error otherwise. The error is logged
+    by <code>sqlite3_web</code> itself as <code>Error in worker: …</code>.
+  </p>
+  <p>
+    <label>Tabs to open: <input id="n" type="number" value="5" min="2" max="10"></label>
+  </p>
+  <button id="go">Spawn N sibling tabs</button>
+  <pre id="out"></pre>
+  <script>
+    document.getElementById('go').addEventListener('click', () => {
+      const n = parseInt(document.getElementById('n').value, 10);
+      const out = document.getElementById('out');
+      const opened = [];
+      for (let i = 0; i < n; i++) {
+        const w = window.open('/', '_blank');
+        opened.push(w ? 'ok' : 'blocked');
+      }
+      out.textContent = `tried ${n} popups: ${opened.join(', ')}\n` +
+        '↑ if any are "blocked", allow popups for localhost in Chrome.';
+    });
+  </script>
+</body>
+</html>

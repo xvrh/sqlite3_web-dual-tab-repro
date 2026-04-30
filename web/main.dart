@@ -4,14 +4,14 @@ import 'dart:js_interop_unsafe';
 import 'package:sqlite_async/sqlite_async.dart';
 import 'package:web/web.dart';
 
-/// Minimal `sqlite_async` consumer. Opens a `SqliteDatabase` and runs a
-/// no-op schema statement. That's enough to walk through:
+/// Opens one `SqliteDatabase`. Multiple browser tabs of this page
+/// running concurrently — under cross-origin isolation — race in
+/// `sqlite3_web`'s OPFS feature-detection probe and produce a
+/// `NoModificationAllowedError` in the worker console.
 ///
-///   sqlite_async  →  sqlite3_web feature detection  →  pick OPFS impl  →  open db
-///
-/// Two browser tabs starting that flow concurrently under
-/// `crossOriginIsolated` is what triggers the upstream
-/// `NoModificationAllowedError`.
+/// Each tab's database itself still opens successfully; the error
+/// appears as `Error in worker: NoModificationAllowedError…` in
+/// DevTools.
 void main() async {
   final status = document.getElementById('status') as HTMLPreElement;
   void log(String s) {
@@ -26,12 +26,10 @@ void main() async {
       path: 'repro_db',
       options: const SqliteOptions(webSqliteOptions: WebSqliteOptions()),
     );
-    log('SqliteDatabase created, awaiting first query…');
-    await db.execute(
-      'CREATE TABLE IF NOT EXISTS t (id INTEGER PRIMARY KEY)',
-    );
+    await db.execute('CREATE TABLE IF NOT EXISTS t (id INTEGER PRIMARY KEY)');
     log('OK');
-  } catch (e) {
+  } catch (e, st) {
     log('FAILED: $e');
+    log(st.toString());
   }
 }
